@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+    body { font-family: sans-serif }
+    h1   { margin-top : 0; padding-top: 0; font-size: 130%; margin-bottom: 0.3ex }
+    h2   { font-size: 115% }
+    p    { margin-top : 0 }
+    ul   { margin-top : 0 }
+    li   { margin-bottom: 0.7ex }
+    
+</style>
+
+<title>nanosecond-precise web timeserver</title>
+
+</head>
+<body>
+    
+    <p><a href='../../../../'>home</a></p>
+    
+    <h1>nanosecond precise web or http timeserver</h1>
+    
+    <ul>
+        <li>UNIX Epoch <a href='nstimeraw.php'>nanoseconds</a></li>
+        <li>$ <a href='chronyParsed.php'>"chronyc tracking" output</a> for validation (JSON and processed)</li>
+        <li>$ <a href='chronyraw.php'>"chronyc tracking" output</a> for validation (raw)</li>
+    </ul>
+    
+    <h2>explanation / discussion</h2>
+    
+    <p>I can't find a simple nano-second precise http / web timeserver, so it's past time to make one.  Here it is.  The "nanoseconds" link above shows you the number 
+        of nanoseconds in the "UNIX Epoch," or since Jan 1, 1970 at 00:00 GMT / UTC.  I get "nanotime()" from 
+        <a href='https://github.com/kwynncom/readable-primary-key/tree/master/php_extension'>my brand-new PHP extension</a>.  
+    </p>
+    
+    <p>The "chronyc tracking" link above is the output of the <a href='https://ubuntu.com/blog/ubuntu-bionic-using-chrony-to-configure-ntp'>Linux command</a> of the same name.  
+    Here is a run:</p>
+    
+    <pre>
+$ chronyc tracking
+Reference ID    : A9FEA97B (169.254.169.123)
+Stratum         : 4
+Ref time (UTC)  : Tue Oct 13 23:53:17 2020
+System time     : 0.000012590 seconds fast of NTP time
+Last offset     : +0.000010085 seconds
+RMS offset      : 0.000012630 seconds
+Frequency       : 67.112 ppm fast
+Residual freq   : +0.000 ppm
+Skew            : 0.010 ppm
+Root delay      : 0.000361930 seconds
+Root dispersion : 0.000279937 seconds
+Update interval : 521.4 seconds
+Leap status     : Normal
+    </pre>
+   
+    <p>
+        Assuming chrony's functioning / output / parameters are in order (see below), my server is extremely accurate.  As I'm writing this, and as you see, 
+        Kwynn.com's server shows "0.000012590 seconds fast of NTP time" or 0.013ms or 13us (micro).  </p>
+    
+    <p>The chronyc output will show a "Reference ID" / time server of 169.254.169.123.  That's an 
+        <a href='https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/set-time.html'>Amazon Web Services (AWS) time server</a>.  That server is stratum 4 where an atomic clock 
+        is stratum 0 and <a href='https://tf.nist.gov/tf-cgi/servers.cgi'>NIST servers are stratum 1</a>.
+        
+        However, given that the AWS time server is probably in the same building as kwynn.com, and given that the AWS us-east-1 locations are in northern Virginia, 
+        very close to the NIST servers in Gaithersburg, Maryland, and given that AWS has great network connectivity, inside and out, I get very accurate 
+        "Root delay" and "Root dispersion," which are measures of accuracy.
+    </p>
+    
+    
+    <p>With that said, as an end user, your receiving that accuracy is a whole other matter.  That's what Network Time Protocol (NTP) and chrony is all about.  In other words, 
+        there is likely at least a 30 - 40ms round trip network delay (see <a href='https://kwynn.com/t/20/01/ping2/'>my web ping</a>).  I am not claiming that 
+        nanosecond precision on the web is particularly practical, but the fact that I couldn't easy find it--for whatever *it* is worth--annoyed me.  With *that* said,
+        I would imagine one could get close to NTP precision if one tried, given my web source.
+    </p>
+    
+    <p>For the record, before I found chrony, I did some previous work on getting NTP time in PHP: <a href='https://kwynn.com/t/9/11/sntp/'>live</a> and 
+        <a href='https://github.com/kwynncom/sntp-web-display'>source code</a>.  Also for the record, I ran ntp "daemons" (ntpd) in Linux years ago--perhaps back to 
+        2005--but those didn't have such lovely output as chrony does.  
+    </p>
+        
+    
+    <p>Also, I've already done a lot of <a href='https://github.com/kwynncom/javascript-synchronized-clock/tree/master/services'>parsing of chronyc's output</a>.  
+        Future work will likely be to make this available in various forms, rather than just the raw form.
+        
+    </p>
+        
+    <h3>validating chrony / false positive</h3>
+    
+    <p>If you boot a machine with no network access, you get something like this:</p>
+    
+    <pre>
+$ chronyc tracking
+Reference ID    : 00000000 ()
+Stratum         : 0
+Ref time (UTC)  : Thu Jan 01 00:00:00 1970
+System time     : 0.000000000 seconds slow of NTP time
+Last offset     : +0.000000000 seconds
+RMS offset      : 0.000000000 seconds
+Frequency       : 8.333 ppm slow
+Residual freq   : +0.000 ppm
+Skew            : 0.000 ppm
+Root delay      : 1.000000000 seconds
+Root dispersion : 1.000000000 seconds
+Update interval : 0.0 seconds
+Leap status     : Not synchronised
+    </pre>
+    
+    <p>I have been using chrony since late 2019, but I didn't notice this irritating issue until early October, 2020.  It seems that chrony should return an error 
+        rather than seemingly perfect time.  However, there are a number of obvious indicators that the data is bad.  I will probably account for that eventually.  
+        That is, I will throw an error under those conditions.      
+    </p>
+    
+    <p>Along those lines, I will try to keep track of update intervals and therefore what a likely maximum update interval is.  I know I've seen on the order of 
+        17 minutes (1,000 seconds), and I think I've seen an hour or more, but I'm not sure.
+    </p>
+    
+</body>
+</html>
