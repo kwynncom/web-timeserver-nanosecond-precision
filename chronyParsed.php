@@ -23,7 +23,7 @@ private static function cmd() {
     return ['cmd' => $cmd, 'basic_array' => $a, 'raw_cmd_result' => $raw];
 }
 
-public static function get() {
+public static function get($asa = false) {
     $tsk = 'first_server_timestamp';
     self::popTime($taFirst, $tsk);
     $r = self::cmd();
@@ -36,6 +36,8 @@ public static function get() {
     
     self::popTime($taLast, $tsk);
     $r[$tsk] = $taLast;
+    
+    if ($asa) return $r;
     
     if (!$iscli) echo(json_encode($r));
     else var_dump($r);
@@ -136,4 +138,4 @@ public static function get20($a) {
 }
 }
 
-chrony_parse::get(); 
+if (!iscli() || didCLICallMe(__FILE__)) chrony_parse::get(); 
