@@ -35,7 +35,7 @@ public static function get($asa = false) {
     if (!$iscli) header('Content-Type: application/json');
     
     self::popTime($taLast, $tsk);
-    $r[$tsk] = $taLast;
+    // $r[$tsk] = $taLast;
     
     if ($asa) return $r;
     
