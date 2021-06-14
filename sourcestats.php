@@ -34,7 +34,7 @@ class parse_sourcestats {
     }
     
     public static function dhmsX($uin) {
-	kwas($uin && is_string($uin), 'invalid argument dhmsMultiplier()');
+	if (!$uin || !is_string($uin)) return 1;
 	$u = trim($uin[0]);
 	switch($u) {
 	    case 'd' : return 84600; break;

@@ -23,19 +23,24 @@ private static function cmd() {
     return ['cmd' => $cmd, 'basic_array' => $a, 'raw_cmd_result' => $raw];
 }
 
+private static function pop30(&$arefin) {
+    // Root dispersion : 0.031060036 seconds
+    // RMS offset      : 0.019947561 seconds
+}
+
 public static function get($asa = false) {
+    $r = [];
     $tsk = 'first_server_timestamp';
-    self::popTime($taFirst, $tsk);
-    $r = self::cmd();
-    $r[$tsk] = $taFirst;
+    self::popTime($r, $tsk);
+    $r = array_merge($r, self::cmd());
     $r['detailed_array'] = self::get20($r['basic_array']);
+    self::pop30($r['detailed_array']);
     $tsk = 'last_server_timestamp';
     
     $iscli = iscli();
     if (!$iscli) header('Content-Type: application/json');
     
-    self::popTime($taLast, $tsk);
-    // $r[$tsk] = $taLast;
+    self::popTime($r, $tsk);
     
     if ($asa) return $r;
     
