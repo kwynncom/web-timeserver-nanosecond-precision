@@ -23,9 +23,16 @@ private static function cmd() {
     return ['cmd' => $cmd, 'basic_array' => $a, 'raw_cmd_result' => $raw];
 }
 
-private static function pop30(&$arefin) {
+private static function pop30($ain, &$arefin) {
     // Root dispersion : 0.031060036 seconds
     // RMS offset      : 0.019947561 seconds
+    
+    $fs = ['Root dispersion', 'RMS offset'];
+    foreach($fs as $f) {
+	kwas(preg_match('/^(\d+\.\d+) seconds/', $ain[$f], $ms), "field $f regex fail");
+	$arefin[$f] = floatval($ms[1]);
+	continue;
+    }
 }
 
 public static function get($asa = false) {
@@ -34,7 +41,7 @@ public static function get($asa = false) {
     self::popTime($r, $tsk);
     $r = array_merge($r, self::cmd());
     $r['detailed_array'] = self::get20($r['basic_array']);
-    self::pop30($r['detailed_array']);
+    self::pop30($r['basic_array'], $r['detailed_array']);
     $tsk = 'last_server_timestamp';
     
     $iscli = iscli();
