@@ -6,10 +6,19 @@ class chrony_log_parse {
     
     const tailn = 6;
     
-    public function __construct($file) {
+    public $an10 = [];
+    
+    private function __construct($file) {
+		
 	$this->load10($file);
 	$this->do10();
 	$this->do20();
+	$this->an10['maxe'] = $this->maxe;
+    }
+    
+    public static function get($file) {
+	$o = new self($file);
+	return $o->an10;
     }
     
     private function do20() {
@@ -36,9 +45,16 @@ class chrony_log_parse {
 	
     }
     
+    public static function getE($e) {
+	kwas(preg_match('/^\d+\.\d+e[+-]\d+$/', $e, $ms), "getE failed with input $e");
+	return floatval($ms[0]);
+	
+    }
+    
     private function do10() {
 	$a = $this->linea;
 	$ret = [];
+	$maxe = false;
 	foreach($a as $l) {
 	    $t = [];
 	    $ds = $t['ds'] = $l[0] . ' ' . $l[1] . ' UTC';
@@ -46,10 +62,21 @@ class chrony_log_parse {
 	    $t['dss'] = date('h:i:s A', $ts);
 	    if (!preg_match('/^-?\d+\.\d+$/',$l[4], $ms)) continue;
 	    $t['freq_corr'] = floatval($ms[0]);
+	   
+	    if ($maxe === false) $maxe = self::getE($l[13]);
+	    
+	    // Max. error
+	    // 1.500e+00
+	    // 4.377e-02
+	    
+	    
+	    
+	    
 	    $ret[] = $t;
 	    continue;
 	}
 	
+	$this->maxe = $maxe;
 	$this->lpa10 = $ret;
     }
     
@@ -81,4 +108,4 @@ class chrony_log_parse {
 	
 }
 
-if (didCLICallMe(__FILE__)) new chrony_log_parse('/var/log/chrony/tracking.log');
+// if (didCLICallMe(__FILE__)) new chrony_log_parse('/var/log/chrony/tracking.log');

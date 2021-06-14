@@ -24,15 +24,18 @@ private static function cmd() {
 }
 
 private static function pop30($ain, &$arefin) {
-    // Root dispersion : 0.031060036 seconds
-    // RMS offset      : 0.019947561 seconds
-    
+   
     $fs = ['Root dispersion', 'RMS offset'];
     foreach($fs as $f) {
 	kwas(preg_match('/^(\d+\.\d+) seconds/', $ain[$f], $ms), "field $f regex fail");
 	$arefin[$f] = floatval($ms[1]);
 	continue;
     }
+    unset($ms);
+    $f = 'Residual freq';
+    
+    kwas(preg_match('/^(-?\d+\.\d+) ppm/', $ain[$f], $ms), "$f regex fail");
+    $arefin[$f] = floatval($ms[1]);
 }
 
 public static function get($asa = false) {

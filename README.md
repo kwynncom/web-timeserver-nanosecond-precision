@@ -42,3 +42,6 @@ extremely accurate (with "extreme" perhaps to be defined later).  I am not tryin
 
 On my local server, I have the maxpoll interval set to 6 / 2^6s / 64s.  My local machine keeps 64 samples when it's stable, so that that's a span of 63 
 minutes (currently showing 66), which is on the order of Kwynn.com.  
+
+    // Root dispersion : 0.031060036 seconds
+    // RMS offset      : 0.019947561 seconds
