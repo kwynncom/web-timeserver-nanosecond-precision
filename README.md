@@ -45,3 +45,49 @@ minutes (currently showing 66), which is on the order of Kwynn.com.
 
     // Root dispersion : 0.031060036 seconds
     // RMS offset      : 0.019947561 seconds
+*********************
+********************
+After waking up a hibernating system, the first call:
+
+$ chronyc tracking
+Reference ID    : 32CDF417 (ntp4.doctor.com)
+Stratum         : 3
+Ref time (UTC)  : Thu Oct 22 02:50:54 2020
+System time     : 0.000000000 seconds slow of NTP time
+Last offset     : +0.491677701 seconds
+RMS offset      : 0.491677701 seconds
+Frequency       : 8.102 ppm slow
+Residual freq   : +0.049 ppm
+Skew            : 0.076 ppm
+Root delay      : 0.061227806 seconds
+Root dispersion : 0.042751539 seconds
+Update interval : 0.0 seconds
+Leap status     : Normal
+
+/* Regarding the Amazon (Web Services) Time Sync Service and 169.254.169.123, see
+https://aws.amazon.com/blogs/aws/keeping-time-with-amazon-time-sync-service/
+
+$ chronyc tracking
+Reference ID    : A9FEA97B (169.254.169.123)
+Stratum         : 4
+
+https://chrony.tuxfamily.org/
+
+
+validating chrony / false positive
+If you boot a machine with no network access, you get something like this:
+
+$ chronyc tracking
+Reference ID    : 00000000 ()
+Stratum         : 0
+Ref time (UTC)  : Thu Jan 01 00:00:00 1970
+System time     : 0.000000000 seconds slow of NTP time
+Last offset     : +0.000000000 seconds
+RMS offset      : 0.000000000 seconds
+Frequency       : 8.333 ppm slow
+Residual freq   : +0.000 ppm
+Skew            : 0.000 ppm
+Root delay      : 1.000000000 seconds
+Root dispersion : 1.000000000 seconds
+Update interval : 0.0 seconds
+Leap status     : Not synchronised

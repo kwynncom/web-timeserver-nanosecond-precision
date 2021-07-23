@@ -34,7 +34,7 @@ private static function pop30($ain, &$arefin) {
     unset($ms);
     $f = 'Residual freq';
     
-    kwas(preg_match('/^(-?\d+\.\d+) ppm/', $ain[$f], $ms), "$f regex fail");
+    kwas(preg_match('/^([-+]?\d+\.\d+) ppm/', $ain[$f], $ms), "$f regex fail");
     $arefin[$f] = floatval($ms[1]);
 }
 
