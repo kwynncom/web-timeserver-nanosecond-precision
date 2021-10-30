@@ -33,7 +33,6 @@ class chrony_log_parse {
 	$change = 0;
 	for($i=0; $i < $li; $i++) $change += abs($a[$i  ]['freq_corr'] - 
 					         $a[$i+1]['freq_corr']);
-	
 
 	unset($fi, $li, $i, $a);
 	
@@ -53,10 +52,12 @@ class chrony_log_parse {
     }
     
     private function do10() {
-	$a = $this->linea['t'];
 	$ret = [];
 	$maxe = false;
-	foreach($a as $l) {
+	foreach($this->linea as $ts => $snas)
+	{
+		if (!isset($snas['t'])) continue;
+		$l =	   $snas['t'];
 	    $t = [];
 	    $ds = $t['ds'] = $l[0] . ' ' . $l[1] . ' UTC';
 	    $ts = $t['ts'] = strtotime($ds);
@@ -65,14 +66,7 @@ class chrony_log_parse {
 	    $t['freq_corr'] = floatval($ms[0]);
 	   
 	    if ($maxe === false) $maxe = self::getE($l[13]);
-	    
-	    // Max. error
-	    // 1.500e+00
-	    // 4.377e-02
-	    
-	    
-	    
-	    
+    
 	    $ret[] = $t;
 	    continue;
 	}
@@ -84,6 +78,8 @@ class chrony_log_parse {
     private function load10() {
 		
 		foreach(self::files as $f) {
+		
+			$fsn = substr($f, 0, 1);
 			
 			$cmd  = '';
 			$cmd .= 'tail -n ';
@@ -95,23 +91,18 @@ class chrony_log_parse {
 			$t = shell_exec($cmd); kwas($t && is_string($t) && strlen($t) > 30, 'chrony tracking file load fail shell');
 			$ret = [];
 			$la = explode("\n", $t); 
-			$i = 0;
+			$lii = 0;
 			foreach($la as $l) {
 				if (!$l) continue; // the blank string following the last line
 				if (strpos($l, '='   ) !== false) continue; // header =====
 				if (strpos($l, 'Date') !== false) continue; // header labels
 				$a = preg_split('/\s+/', $l);
-				$ret[] = $a;
-				if (++$i >= self::tailn) break;
+				$this->linea[$a[0] . ' ' . $a[1]][$fsn] = $a;
+				if (++$lii >= self::tailn) break;
 			}
-
-			$fi = substr($f, 0, 1);
-			$this->linea[$fi] = $ret;
 		}
 		return;
     }
-	
-	
 }
 
 if (didCLICallMe(__FILE__)) chrony_log_parse::get();
