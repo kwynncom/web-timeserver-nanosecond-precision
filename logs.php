@@ -5,20 +5,21 @@ require_once('/opt/kwynn/kwutils.php');
 class chrony_log_parse {
     
     const tailn = 6;
+	const path  = '/var/log/chrony/';
+	const files = ['tracking.log', 'statistics.log', 'measurements.log'];
     
     public $an10 = [];
     
-    private function __construct($file) {
-		
-	$this->load10($file);
-	$this->do10();
-	$this->do20();
-	$this->an10['maxe'] = $this->maxe;
+    private function __construct() {
+		$this->load10();
+		$this->do10();
+		$this->do20();
+		$this->an10['maxe'] = $this->maxe;
     }
     
-    public static function get($file) {
-	$o = new self($file);
-	return $o->an10;
+    public static function get() {
+		$o = new self();
+		return $o->an10;
     }
     
     private function do20() {
@@ -52,7 +53,7 @@ class chrony_log_parse {
     }
     
     private function do10() {
-	$a = $this->linea;
+	$a = $this->linea['t'];
 	$ret = [];
 	$maxe = false;
 	foreach($a as $l) {
@@ -80,32 +81,37 @@ class chrony_log_parse {
 	$this->lpa10 = $ret;
     }
     
-    private function load10($fpath) {
-	$cmd  = '';
-	$cmd .= 'tail -n ';
-	$cmd .= self::tailn + 3; // account for headers
-	$cmd .=  ' ';
-	$cmd .= $fpath;
-	$cmd .= ' | tac';
-	
-	$t = shell_exec($cmd); kwas($t && is_string($t) && strlen($t) > 30, 'chrony tracking file load fail shell');
-	$ret = [];
-	$la = explode("\n", $t); 
-	$i = 0;
-	foreach($la as $l) {
-	    if (!$l) continue; // the blank string following the last line
-	    if (strpos($l, '='   ) !== false) continue; // header =====
-	    if (strpos($l, 'Date') !== false) continue; // header labels
-	    $a = preg_split('/\s+/', $l);
-	    $ret[] = $a;
-	    if (++$i >= self::tailn) break;
-	}
-	
-	$this->linea = $ret;
-	return;
+    private function load10() {
+		
+		foreach(self::files as $f) {
+			
+			$cmd  = '';
+			$cmd .= 'tail -n ';
+			$cmd .= self::tailn + 3; // account for headers
+			$cmd .=  ' ';
+			$cmd .= self::path . $f;
+			$cmd .= ' | tac';
+
+			$t = shell_exec($cmd); kwas($t && is_string($t) && strlen($t) > 30, 'chrony tracking file load fail shell');
+			$ret = [];
+			$la = explode("\n", $t); 
+			$i = 0;
+			foreach($la as $l) {
+				if (!$l) continue; // the blank string following the last line
+				if (strpos($l, '='   ) !== false) continue; // header =====
+				if (strpos($l, 'Date') !== false) continue; // header labels
+				$a = preg_split('/\s+/', $l);
+				$ret[] = $a;
+				if (++$i >= self::tailn) break;
+			}
+
+			$fi = substr($f, 0, 1);
+			$this->linea[$fi] = $ret;
+		}
+		return;
     }
 	
 	
 }
 
-// if (didCLICallMe(__FILE__)) new chrony_log_parse('/var/log/chrony/tracking.log');
+if (didCLICallMe(__FILE__)) chrony_log_parse::get();

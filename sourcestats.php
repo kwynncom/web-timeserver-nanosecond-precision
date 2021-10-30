@@ -29,7 +29,10 @@ class parse_sourcestats {
 	$ss = $ms[2] * (isset($ms[3]) ? 
 		  self::dhmsX($ms[3]) : 1 );
 	$np = intval($ms[1]);
-	$ret = array_merge($ret, [ 'np'   => $np, 'np_span' => $ss ]);
+	
+	$hu['asofU']  = $now = time();
+	$hu['asofr' ] = date('r', $now);
+	$ret = array_merge($ret, [ 'np'   => $np, 'np_span' => $ss ], $hu);
 	$this->np = $ret;
     }
     
@@ -46,4 +49,4 @@ class parse_sourcestats {
     }
 }
 
-if (didCLICallMe(__FILE__)) new parse_sourcestats();
+if (didCLICallMe(__FILE__)) parse_sourcestats::get();
