@@ -11,7 +11,7 @@ class chrony_anal {
     public function __construct() {
 	$this->np = parse_sourcestats::get(); 
 	$this->tr = chrony_parse::get(true);
-	$this->an10 = chrony_log_parse::get(self::tfile);
+//	$this->an10 = chrony_log_parse::get(self::tfile);
 	$this->do10();
 	return;
     }

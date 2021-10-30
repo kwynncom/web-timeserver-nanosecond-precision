@@ -19,7 +19,7 @@ class chrony_log_parse {
     
     public static function get() {
 		$o = new self();
-		return $o->an10;
+		return $o->linea;
     }
     
     private function do20() {
@@ -105,4 +105,4 @@ class chrony_log_parse {
     }
 }
 
-if (didCLICallMe(__FILE__)) chrony_log_parse::get();
+if (didCLICallMe(__FILE__)) print_r(chrony_log_parse::get());
