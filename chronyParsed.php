@@ -47,14 +47,14 @@ public static function get($asa = false) {
     self::pop30($r['basic_array'], $r['detailed_array']);
     $tsk = 'last_server_timestamp';
     
-    $iscli = iscli();
-    if (!$iscli) header('Content-Type: application/json');
-    
     self::popTime($r, $tsk);
     
-    if ($asa) return $r;
-    
-    if (!$iscli) echo(json_encode($r));
+    if ($asa || !self::didCallMe()) return $r;
+
+	if (!iscli()) {
+		header('Content-Type: application/json');
+		echo(json_encode($r));
+	}
     else var_dump($r);
     
 }
@@ -150,7 +150,16 @@ public static function get20($a) {
 	if (PHP_SAPI === 'cli') throw $ex;
 	return false; 
     }
-}
+} // func
+
+public static function didCallMe() {
+	if (didCLICallMe(__FILE__)) return TRUE;
+	$h = $_SERVER['REQUEST_URI'];
+	$n = basename(__FILE__);
+	if (strpos($h, $n) !== false) return TRUE;
+	return false;
 }
 
-if (!iscli() || didCLICallMe(__FILE__)) chrony_parse::get(); 
+} //class
+
+if (chrony_parse::didCallMe()) chrony_parse::get(); 

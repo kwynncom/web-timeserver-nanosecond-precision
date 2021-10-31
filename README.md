@@ -1,10 +1,34 @@
 # web-timeserver-nanosecond-precision
 nanosecond precise web timeserver with chrony validation
 
-https://kwynn.com/t/20/10/timeserver/ - live at
+The inputs /outputs of this code (5 inputs / features):
 
-The above explains quite a bit (it is this repo's /index.html).  The following was written months later and is esoteric.
+IN: https://kwynn.com/t/20/10/timeserver/nstimeraw.php
+OUT: 1635615645680522574 [nanoseconds in UNIX Epoch]
 
+IN: https://kwynn.com/t/20/10/timeserver/chronyParsed.php
+see full output below
+
+IN: https://kwynn.com/t/20/10/timeserver/chronyraw.php
+see "chronyc tracking" output below
+
+IN: https://kwynn.com/t/20/10/timeserver/chronyraw.php?opt=sourcestats
+210 Number of sources = 1
+Name/IP Address            NP  NR  Span  Frequency  Freq Skew  Offset  Std Dev
+==============================================================================
+169.254.169.123             7   6   56m     -0.000      0.018   -111ns  8156ns
+
+IN: https://kwynn.com/t/20/10/timeserver/chronyraw.php?opt=both
+OUT: see further below
+
+**********
+EXPLANATION
+
+https://kwynn.com/t/20/10/timeserver/ 
+
+That page explains quite a bit (it is this repo's /index.html).  The following was written months later and is esoteric.
+
+UPDATE: I'm moving the sourcestats parser to another repo.  (2021/10/30)  I'll try to remember to move this later.
 
 My sourcestats parser makes several assumptions / has limitations:
 
@@ -91,3 +115,41 @@ Root delay      : 1.000000000 seconds
 Root dispersion : 1.000000000 seconds
 Update interval : 0.0 seconds
 Leap status     : Not synchronised
+
+**************
+******************
+FULL I/O
+
+IN: https://kwynn.com/t/20/10/timeserver/chronyParsed.php
+OUT [I am adding newlines] 
+{"first_server_timestamp":{"number":1635615646419222645,"unit_long":"nanoseconds in UNIX Epoch","unit":"ns","number_type":"integer"},
+"cmd":"chronyc tracking","basic_array":{"Reference ID":"A9FEA97B (169.254.169.123)","Stratum":"4","Ref time (UTC)":"Sat Oct 30 17:36:44 2021",
+"System time":"0.000007654 seconds slow of NTP time","Last offset":"-0.000018202 seconds","RMS offset":"0.000023542 seconds","Frequency":"65.596 ppm fast",
+"Residual freq":"-0.000 ppm","Skew":"0.022 ppm","Root delay":"0.000321157 seconds","Root dispersion":"0.000485133 seconds",
+"Update interval":"1039.0 seconds","Leap status":"Normal"},"raw_cmd_result":
+"Reference ID    : A9FEA97B (169.254.169.123)\nStratum         : 4\nRef time (UTC)  : Sat Oct 30 17:36:44 2021\n
+System time     : 0.000007654 seconds slow of NTP time\nLast offset     : -0.000018202 seconds\n
+...
+
+
+IN: https://kwynn.com/t/20/10/timeserver/chronyraw.php?opt=both
+OUT: 
+Reference ID    : A9FEA97B (169.254.169.123)
+Stratum         : 4
+Ref time (UTC)  : Sat Oct 30 17:36:44 2021
+System time     : 0.000007578 seconds slow of NTP time
+Last offset     : -0.000018202 seconds
+RMS offset      : 0.000023542 seconds
+Frequency       : 65.596 ppm fast
+Residual freq   : -0.000 ppm
+Skew            : 0.022 ppm
+Root delay      : 0.000321157 seconds
+Root dispersion : 0.000486915 seconds
+Update interval : 1039.0 seconds
+Leap status     : Normal
+
+****** sourcestats ******
+210 Number of sources = 1
+Name/IP Address            NP  NR  Span  Frequency  Freq Skew  Offset  Std Dev
+==============================================================================
+169.254.169.123             7   6   56m     -0.000      0.018   -112ns  8156ns
