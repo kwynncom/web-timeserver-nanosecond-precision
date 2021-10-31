@@ -9,6 +9,6 @@ $fs = ['time', 'nanotime'];
 foreach($fs as $f) var_dump($f());
 var_dump(nanopk(NANOPK_VERSION));
 
-echo('this file version 2021/10/31 7:28pm' . "\n");
+echo('this file version 2021/10/31 7:30pm' . "\n");
 
 // originally from https://github.com/kwynncom/nano-php-extension/blob/main/test.php
