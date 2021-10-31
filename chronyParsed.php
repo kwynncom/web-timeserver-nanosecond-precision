@@ -25,7 +25,7 @@ private static function cmd() {
 
 private static function pop30($ain, &$arefin) {
    
-    $fs = ['Root dispersion', 'RMS offset'];
+    $fs = ['Root dispersion', 'RMS offset', 'Root delay'];
     foreach($fs as $f) {
 	kwas(preg_match('/^(\d+\.\d+) seconds/', $ain[$f], $ms), "field $f regex fail");
 	$arefin[$f] = floatval($ms[1]);
@@ -38,18 +38,25 @@ private static function pop30($ain, &$arefin) {
     $arefin[$f] = floatval($ms[1]);
 }
 
-public static function get($asa = false) {
+private static function pop40($s, &$aref, $k) {
+	preg_match('/^([-+]?\d+\.\d+) seconds/', $s, $m);
+	$aref[$k] = floatval($m[1]);
+}
+
+public static function get() {
     $r = [];
     $tsk = 'first_server_timestamp';
     self::popTime($r, $tsk);
     $r = array_merge($r, self::cmd());
     $r['detailed_array'] = self::get20($r['basic_array']);
     self::pop30($r['basic_array'], $r['detailed_array']);
+	$lok = 'Last offset';
+	self::pop40($r['basic_array'][$lok], $r['detailed_array'], $lok); unset($lok);
     $tsk = 'last_server_timestamp';
     
     self::popTime($r, $tsk);
     
-    if ($asa || !self::didCallMe()) return $r;
+    if (!self::didCallMe()) return $r;
 
 	if (!iscli()) {
 		header('Content-Type: application/json');
@@ -154,7 +161,8 @@ public static function get20($a) {
 
 public static function didCallMe() {
 	if (didCLICallMe(__FILE__)) return TRUE;
-	$h = $_SERVER['REQUEST_URI'];
+	if (!isset($_SERVER['REQUEST_URI'])) return false;
+	$h =	   $_SERVER['REQUEST_URI'];
 	$n = basename(__FILE__);
 	if (strpos($h, $n) !== false) return TRUE;
 	return false;
