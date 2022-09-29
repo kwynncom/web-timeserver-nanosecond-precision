@@ -45,16 +45,19 @@ private static function pop40($s, &$aref, $k) {
 
 public static function get() {
     $r = [];
-    $tsk = 'first_server_timestamp';
-    self::popTime($r, $tsk);
-    $r = array_merge($r, self::cmd());
-    $r['detailed_array'] = self::get20($r['basic_array']);
-    self::pop30($r['basic_array'], $r['detailed_array']);
-	$lok = 'Last offset';
-	self::pop40($r['basic_array'][$lok], $r['detailed_array'], $lok); unset($lok);
-    $tsk = 'last_server_timestamp';
-    
-    self::popTime($r, $tsk);
+	
+	try {
+		$tsk = 'first_server_timestamp';
+		self::popTime($r, $tsk);
+		$r = array_merge($r, self::cmd());
+		$r['detailed_array'] = self::get20($r['basic_array']);
+		self::pop30($r['basic_array'], $r['detailed_array']);
+		$lok = 'Last offset';
+		self::pop40($r['basic_array'][$lok], $r['detailed_array'], $lok); unset($lok);
+		$tsk = 'last_server_timestamp';
+
+		self::popTime($r, $tsk);
+	} catch(Exception $ex) { return $r; }
     
     if (!self::didCallMe()) return $r;
 
