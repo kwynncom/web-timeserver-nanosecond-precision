@@ -158,7 +158,7 @@ public static function get20($a) {
     }
     catch (Exception $ex) { 
 	if (PHP_SAPI === 'cli') throw $ex;
-	return false; 
+	return []; 
     }
 } // func
 
